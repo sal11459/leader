@@ -1,93 +1,137 @@
-import React, { useState, useEffect } from 'react';
-import Profiles from './profiles';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './board.css';
+import pfimg from "./profile.jpg" ;
 
 export default function Board() {
-  const [userid, setUserid] = useState('');
+  const [userId, setUserid] = useState('');
   const [leaderboard, setLeaderboard] = useState([]);
   const [difficulty, setDifficulty] = useState('Easy');
   const [domain, setDomain] = useState('All');
   const [showDomainSelection, setShowDomainSelection] = useState(false);
+  const [uniqueDomains, setUniqueDomains] = useState([]);
+  const [userPhoto, setUserPhoto] = useState('default-photo-url'); // Set a default photo URL
 
   useEffect(() => {
     const fetchedUserId = localStorage.getItem('userId');
     setUserid(fetchedUserId);
 
-    fetchUserProfileData(fetchedUserId);
+    fetchUserData(fetchedUserId); // Fetch user data for photo URL
     fetchLeaderboardData(fetchedUserId);
-  }, []);
+  }, [difficulty, domain]);
 
-  const fetchUserProfileData = (userId) => {
-    axios
-      .get(`http://127.0.0.1:8000/api/userprofile/${userId}`)
-      .then((response) => {
-        const userName = response.data.name || 'Unknown';
-        setLeaderboard((prevLeaderboard) => prevLeaderboard.map((user) => ({ ...user, name: userName })));
-      })
-      .catch((error) => {
-        console.error('Error fetching user profile data:', error);
-      });
+  const fetchUserData = async (userId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/userprofile/${userId}`);
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log("Fetched user data:", data);
+
+      if (data.photo !== null) {
+        const completePhotoUrl = `http://127.0.0.1:8000${data.photo}`;
+        setUserPhoto(completePhotoUrl);
+      } else {
+        setUserPhoto('default-photo-url');
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
-  const fetchLeaderboardData = (userId) => {
+
+  useEffect(() => {
+    setUserid(localStorage.getItem('userId'));
+  }, []);
+
+  // useEffect(() => {
+  //   if (userId) {
+  //     fetchUserData();
+  //   }
+  // }, [userId]);
+
+
+  const fetchLeaderboardData = () => {
+    const difficultyParam = difficulty !== 'All' ? `&difficulty_level=${difficulty}` : '';
+    const domainParam = domain !== 'All' ? `&domain=${domain}` : '';
+
     axios
-      .get(`http://127.0.0.1:8000/api/questionhistoryget/?user_id=${userId}`)
+      .get(`http://127.0.0.1:8000/api/questionhistoryget/?${difficultyParam}${domainParam}`)
       .then((response) => {
+        console.log('Fetched Leaderboard Data:', response.data);
         const fetchedLeaderboard = response.data.map((item) => ({
-          score: item.score,
+          user: item.user,
+          score: JSON.parse(item.score),
           domain: item.domain,
           difficulty_level: item.difficulty_level,
+          photo: item.photo || 'default-photo-url',
         }));
-        setLeaderboard(fetchedLeaderboard);
 
-        // Automatically select the domain button based on the fetched domain
-        if (fetchedLeaderboard.length > 0) {
-          setDomain(fetchedLeaderboard[0].domain);
-        }
+        const uniqueDomainsArray = Array.from(new Set(fetchedLeaderboard.map((item) => item.domain)));
+        setUniqueDomains(uniqueDomainsArray);
+
+        const filteredLeaderboard = filterAndRankLeaderboard(fetchedLeaderboard);
+        setLeaderboard(filteredLeaderboard);
       })
       .catch((error) => {
         console.error('Error fetching leaderboard data:', error);
       });
   };
 
+
+  const filterAndRankLeaderboard = (fetchedLeaderboard) => {
+    const userMap = new Map();
+
+    fetchedLeaderboard.forEach((current) => {
+      const userKey = `${current.user}_${current.difficulty_level}_${current.domain}`;
+      const maxScore = current.score || 0;
+
+      // Check if the current user matches the selected difficulty and domain
+      if (
+        (current.difficulty_level === difficulty || difficulty === 'All') &&
+        (current.domain === domain || domain === 'All')
+      ) {
+        if (!userMap.has(userKey)) {
+          userMap.set(userKey, {
+            user: current.user,
+            domain: current.domain,
+            difficulty_level: current.difficulty_level,
+            maxScore,
+            rank: 1,
+            photo: current.photo,
+          });
+        } else {
+          const existingUser = userMap.get(userKey);
+          if (maxScore > existingUser.maxScore) {
+            existingUser.maxScore = maxScore;
+            existingUser.photo = current.photo;
+          }
+        }
+      }
+    });
+
+    const filteredLeaderboard = Array.from(userMap.values()).sort((a, b) => b.maxScore - a.maxScore);
+
+    filteredLeaderboard.forEach((user, index) => {
+      user.rank = index + 1;
+    });
+
+    return filteredLeaderboard;
+  };
+
   const handleDifficultyChange = (newDifficulty) => {
     setDifficulty(newDifficulty);
-    if (newDifficulty !== 'All') {
-      setShowDomainSelection(true);
-    } else {
-      setShowDomainSelection(false);
-      setDomain('All');
-    }
+    setShowDomainSelection(newDifficulty !== 'All');
   };
 
   const handleDomainChange = (newDomain) => {
     setDomain(newDomain);
-    // Perform any other necessary actions related to domain selection
   };
 
-  const filteredProfiles = leaderboard.map((profile) => {
-    const selectedDifficulty = difficulty;
-    const selectedDomain = domain;
-
-    const maxScore =
-      profile.score &&
-      Math.max(
-        profile.score[selectedDifficulty]?.[selectedDomain] || 0,
-        profile.score['Medium']?.[selectedDomain] || 0,
-        profile.score['Difficult']?.[selectedDomain] || 0
-      );
-
-    return {
-      ...profile,
-      selectedDifficulty,
-      selectedDomain,
-      maxScore,
-    };
-  }).filter((profile) => {
-    const score = profile.maxScore;
-    return difficulty === 'All' || score !== undefined;
-  });
+  console.log('Leaderboard State:', leaderboard);
 
   return (
     <div className="container">
@@ -98,18 +142,18 @@ export default function Board() {
         <br />
         <h2>Select Difficulty:</h2>
         <div className="difficulty-buttons">
-          <button onClick={() => handleDifficultyChange('Easy')}>Easy</button>
-          <button onClick={() => handleDifficultyChange('Medium')}>Medium</button>
-          <button onClick={() => handleDifficultyChange('Difficult')}>Difficult</button>
+          <button onClick={() => handleDifficultyChange('easy')}>Easy</button>
+          <button onClick={() => handleDifficultyChange('medium')}>Medium</button>
+          <button onClick={() => handleDifficultyChange('difficult')}>Difficult</button>
         </div>
 
         {showDomainSelection && (
           <>
-            <h2>Select Domain:</h2>
+            <h2>Domains:</h2>
             <div className="domain-buttons">
-              {leaderboard.map((profile) => (
-                <button key={profile.domain} onClick={() => handleDomainChange(profile.domain)}>
-                  {profile.domain}
+              {uniqueDomains.map((domain) => (
+                <button key={domain} onClick={() => handleDomainChange(domain)}>
+                  {domain}
                 </button>
               ))}
             </div>
@@ -117,15 +161,46 @@ export default function Board() {
         )}
       </div>
 
-      {(!showDomainSelection || domain !== 'All') && (
+      {/* {leaderboard.length > 0 && (
         <div className="board" style={{ textAlign: 'mid-center' }}>
-          <h1 className='leaderboard'>LEADERBOARD</h1>
-          <div>
-            {domain !== 'All' && difficulty !== 'All' && (
-              <h2>{`${difficulty} - ${domain}`}</h2>
-            )}
-            <Profiles Leaderboard={filteredProfiles} />
-          </div>
+          <h1 className="leaderboard">LEADERBOARD</h1>
+          {leaderboard.map((user, index) => (
+            <div key={index} className="user-profile">
+              <span className="rank">#{user.rank}</span>
+              <span className="iduser">{user.user}</span>
+              <img className="profile-image" src={userPhoto} alt={`User ${index + 1}`} />
+              <p> Score: {user.maxScore}</p>
+            </div>
+          ))}
+        </div>
+      )} */}
+
+{leaderboard.length > 0 && (
+  <div className="board" style={{ textAlign: 'mid-center' }}>
+    <h1 className="leaderboard">LEADERBOARD</h1>
+    {leaderboard.map((user, index) => (
+      <div key={index} className="user-profile">
+        <span className="rank">#{user.rank}</span>
+        <span className="iduser">{user.user}</span>
+        <img
+          className="profile-image"
+          src={userId === user.user ? userPhoto : pfimg}
+          alt={`User ${index + 1}`}
+          width="175px"
+          height="175px"
+        />
+        <p> Score: {user.maxScore}</p>
+      </div>
+    ))}
+  </div>
+)}
+
+      
+
+      {leaderboard.length === 0 && (
+        <div className="board" style={{ textAlign: 'mid-center' }}>
+          <h1 className="leaderboard">LEADERBOARD</h1>
+          <p>Select the difficulty level and domain.</p>
         </div>
       )}
     </div>

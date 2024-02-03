@@ -20,10 +20,10 @@ export default function Profiles({ Leaderboard }) {
               <img
                 className="profile-image-medium"
                 src={profile.photo}  // Adjust according to the actual API response structure
-                alt={profile.name}
+                alt={profile.user}
               />
               <div className="info">
-                <h3 className="name">{profile.name}</h3>
+                <h3 className="name">{profile.user}</h3>
                 <p>Domain: {profile.domain}</p>
                 <p>Difficulty Level: {profile.difficulty_level}</p>
                 <p>Max Score: {profile.maxScore}</p>
@@ -41,10 +41,10 @@ export default function Profiles({ Leaderboard }) {
             <img
               className="profile-image"
               src={profile.photo}  // Adjust according to the actual API response structure
-              alt={profile.name}
+              alt={profile.user}
             />
             <div className="info">
-              <h3 className="name">{profile.name}</h3>
+              <h3 className="name">{profile.user}</h3>
               <p>Domain: {profile.domain}</p>
               <p>Difficulty Level: {profile.difficulty_level}</p>
               <p>Max Score: {profile.maxScore}</p>

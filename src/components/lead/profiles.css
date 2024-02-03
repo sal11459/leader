@@ -5,7 +5,6 @@
   height: 90vh;
   display: flex;
   flex-direction: column;
-  /*background-color: antiquewhite;*/
   border-color: black;
   margin-top: 1.2em;
   padding-top: 1em;
@@ -22,13 +21,11 @@
   background-color: antiquewhite;
   border-radius: 10px;
   flex-wrap: wrap;
-  /* height: 50dvh; */
-  /* width: 00 vh; */
 }
 
 /* Highlighting Specific User */
 .flex.highlight {
-  background-color: #d1d0ca; /* Yellow background for highlighting */
+  background-color: #d1d0ca;
   text-wrap: wrap;
   flex-wrap: wrap;
   height: 10dvh;
@@ -38,7 +35,7 @@
 /* Profile Image */
 .flex img {
   width: 70px;
-  height: 70px; /* Adjusted height to maintain the aspect ratio */
+  height: 70px;
   border-radius: 50%;
   margin-right: 10px;
   margin-left: 1.2em;
@@ -60,7 +57,7 @@ h3 {
 }
 
 /* Highlighting Rank 1 */
-.flex:nth-child(0) {
+.flex:nth-child(1) {  /* Corrected from nth-child(0) to nth-child(1) */
   position: sticky;
   top: 0.2em;
   z-index: 1;
@@ -69,17 +66,16 @@ h3 {
 }
 
 /* Top 3 Profiles */
-.top-profiles {
+.top-three {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-around;
   margin-bottom: 10px;
 }
 
 /* Top 3 Profile Image */
 .top-profiles .flex img {
   width: 50px;
-  height: 50px; /* Adjusted height to maintain the aspect ratio */
+  height: 50px;
   border-radius: 50%;
   margin-right: 10px;
   margin-left: 1.2em;
@@ -96,12 +92,10 @@ h3 {
   font-weight: bold;
 }
 
-
 /* Top Three Profiles */
 .top-three {
   display: flex;
   justify-content: space-around;
-  /* Other styles */
 }
 
 /* Individual Profile in Top Three */
@@ -110,7 +104,6 @@ h3 {
   flex-direction: column;
   align-items: center;
   margin-bottom: 10px;
-  /* Other styles */
 }
 
 /* Podium Profile */
@@ -119,7 +112,6 @@ h3 {
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  /* Other styles */
 }
 
 /* Medium-sized Profile Image */
@@ -127,28 +119,22 @@ h3 {
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  /* Other styles */
 }
 
 .other-profiles {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px; /* Adjust space between profiles */
-  /* Other styles */
+  gap: 20px;
 }
-
-
 
 /* Normal Profile Image */
 .profile-image {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  /* Other styles */
 }
 
 /* Additional styling for names, scores, ranks, etc. */
