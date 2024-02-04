@@ -1,7 +1,10 @@
 /* container class styles */
 .container {
   display: flex;
-  width: auto;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px; /* Added padding to container for better spacing */
+  box-sizing: border-box; /* Include padding in width */
 }
 
 /* Sidebar Styles */
@@ -10,45 +13,32 @@
   top: 0;
   left: 0;
   height: 100%;
-  width: 20%;
-  background-color: antiquewhite;
-  padding: 20px;
+  width: 26%;
+  background-color: rgb(198, 203, 204);
+  padding: 10px; /* Adjusted padding for better spacing */
+  box-sizing: border-box; /* Add box-sizing to include padding in width */
 }
 
 /* Sidebar Button Styles */
 .sidebar button {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   padding: 8px 12px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   background-color: #ddd;
   transition: background-color 0.3s ease;
+  width: 100%; /* Make buttons fill the width of the sidebar */
 }
 
 .sidebar button:hover {
-  background-color: #ccc;
+  background: rgb(59, 117, 244);
 }
 
-body {
-  background-color: cornsilk;
-}
-
-.container {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-}
-
-/* Sidebar Styles */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 20%;
-  background-color: antiquewhite;
-  padding: 20px;
+/* Sidebar Heading Styles */
+.sidebar h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
 }
 
 /* Leaderboard Styles */
@@ -56,38 +46,110 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: 25%;
+  margin-left: 26%; /* Adjusted margin to a percentage */
   padding: 20px;
-  width: 50%;
-  height: fit-content;
+  width: 74%; /* Adjusted width */
+  box-sizing: border-box; /* Add box-sizing to include padding in width */
 }
 
 /* User Profile Styles */
 .user-profile {
   display: flex;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 15px;
-  background: bisque;
-  width:100%;
-  height:10%;
-  padding: auto;
-  justify-content: space-around;
-  
+  background: rgb(152, 151, 160);
+  width: 80%;
+  padding: 10px;
+  box-sizing: border-box; /* Added box-sizing */
 }
 
+.user-profile:hover {
+  background: rgb(59, 117, 244);
 
-.iduser {
-  font-size: 1.2em;
-  margin-right: 10px;
 }
+
+.un,
+.iduser,
 .rank {
-  font-size: 1.2em;
-  margin-right: 10px;
+  font-size: 1em; /* Adjusted font size */
+  margin-bottom: 5px; /* Adjusted spacing */
 }
 
 .profile-image {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-bottom: 5px; /* Adjusted spacing */
+}
+
+/* Header Styles */
+.header-text {
+  font-size: 1.5em; /* Adjusted font size */
+  margin-bottom: 10px;
+}
+
+/* Add a media query for smaller screens */
+@media only screen and (max-width: 328px) {
+  .container {
+    flex-direction: column;
+    padding: 0; /* Remove padding for smaller screens */
+  }
+
+  .board,
+  .sidebar {
+    max-width: 100%;
+    margin-left: 0; /* Reset margin for smaller screens */
+  }
+
+  /* Adjust font size for smaller screens */
+  .sidebar h2,
+  .header-text {
+    max-width: 100%;
+    font-size: 1.2em;
+  }
+
+  .sidebar button,
+  .un,
+  .iduser,
+  .rank {
+    max-width: 100%;
+    font-size: 0.9em;
+  }
+
+  .profile-image {
+    max-width: 100%;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  margin: 0 5px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+}
+
+.pagination button.active {
+  background-color: #4caf50;
+  color: white;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
